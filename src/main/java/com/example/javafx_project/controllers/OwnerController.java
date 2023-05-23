@@ -102,6 +102,37 @@ public class OwnerController implements Initializable {
         ownerTableView.setItems(ownerList);
     }
 
+    @FXML
+    private void openEditOwnerForm() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/EditOwner.fxml"));
+            Parent parent = loader.load();
+            EditOwnerController editOwnerController = loader.getController();
+            Owner selectedOwner = ownerTableView.getSelectionModel().getSelectedItem();
+            editOwnerController.setOwner(selectedOwner);
+            editOwnerController.setOwnerService(ownerService); // Pass the OwnerService instance to the controller
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(parent));
+            stage.showAndWait();
+
+            // After the EditOwnerForm is closed, you can handle the update if needed
+            if (editOwnerController.isUpdateRequired()) {
+                Owner updatedOwner = editOwnerController.getUpdatedOwner();
+                ownerService.update(updatedOwner); // Perform the update operation using the updatedOwner object
+                // Refresh the table view or any other necessary actions
+                loadOwners();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
     private Callback<TableColumn<Owner, Button>, TableCell<Owner, Button>> createEditButtonCellFactory() {
         return new Callback<>() {
             @Override
